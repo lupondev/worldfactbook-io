@@ -10,18 +10,34 @@ import { SITE_URL } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
+const HOME_TITLE = "WorldFactbook.io — AI-Powered World Factbook Alternative";
 const PAGE_DESCRIPTION =
-  "The CIA World Factbook ended public updates on 4 February 2026. WorldFactbook.io continues open, structured country intelligence for 260+ entities — weekly refresh, free API.";
+  "The free AI-powered replacement for the CIA World Factbook (shut down Feb 2026). 261 countries, live data from World Bank & IMF, AI country intelligence, free API. Updated weekly.";
+
+const PAGE_KEYWORDS = [
+  "world factbook alternative",
+  "CIA world factbook replacement",
+  "world factbook 2026",
+  "AI country data",
+  "free country data API",
+  "world factbook AI",
+  "country intelligence platform",
+];
 
 export const metadata: Metadata = {
-  title: "World Factbook — WorldFactbook.io",
+  title: HOME_TITLE,
   description: PAGE_DESCRIPTION,
+  keywords: PAGE_KEYWORDS,
   alternates: { canonical: "/" },
   openGraph: {
-    title: "WorldFactbook.io — The World Factbook, continued",
-    description:
-      "Live global intelligence for 260+ countries — geography, economy, government, society, military, and a free REST API.",
+    title: HOME_TITLE,
+    description: PAGE_DESCRIPTION,
     url: SITE_URL,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: HOME_TITLE,
+    description: PAGE_DESCRIPTION,
   },
 };
 
@@ -80,11 +96,11 @@ export default async function HomePage() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "WorldFactbook.io",
-    url: SITE_URL,
-    description: PAGE_DESCRIPTION,
+    url: "https://worldfactbook.io",
+    description: "AI-powered replacement for the CIA World Factbook",
     potentialAction: {
       "@type": "SearchAction",
-      target: `${SITE_URL}/countries/{search_term_string}/`,
+      target: "https://worldfactbook.io/countries/{search_term_string}/",
       "query-input": "required name=search_term_string",
     },
   };

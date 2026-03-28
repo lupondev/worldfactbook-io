@@ -4,7 +4,7 @@ import { DM_Sans, Playfair_Display, Space_Mono } from "next/font/google";
 import GoogleAnalytics from "./components/GoogleAnalytics";
 import "./globals.css";
 
-import { SITE_NAME, SITE_URL } from "@/lib/site";
+import { SITE_URL } from "@/lib/site";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -28,24 +28,25 @@ const spaceMono = Space_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — WorldFactbook.io`,
-    template: `%s — ${SITE_NAME} | WorldFactbook.io`,
+    default: "WorldFactbook.io — AI-Powered World Factbook Alternative",
+    template: `%s | WorldFactbook.io`,
   },
   description:
-    "Open World Factbook data for 260+ countries and territories. Geography, economy, government, military, and society — public domain intelligence with a free REST API.",
+    "The free AI-powered replacement for the CIA World Factbook (shut down Feb 2026). 261 countries, live data from World Bank & IMF, AI country intelligence, free API. Updated weekly.",
   openGraph: {
     type: "website",
     locale: "en_US",
     siteName: "WorldFactbook.io",
-    title: "WorldFactbook.io — The World Factbook, continued",
+    title: "WorldFactbook.io — AI-Powered World Factbook Alternative",
     description:
-      "Live global intelligence: CIA-format country profiles, rankings, compare tool, and free JSON API.",
+      "The free AI-powered replacement for the CIA World Factbook. 261 countries, live World Bank & IMF data, AI briefs, free API. Updated weekly.",
     url: SITE_URL,
   },
   twitter: {
     card: "summary_large_image",
-    title: "WorldFactbook.io",
-    description: "Open World Factbook data — 260+ entities, free API.",
+    title: "WorldFactbook.io — AI-Powered World Factbook Alternative",
+    description:
+      "Free AI-powered World Factbook alternative — 261 countries, live data, AI intelligence, free API.",
   },
   alternates: {
     canonical: "/",
