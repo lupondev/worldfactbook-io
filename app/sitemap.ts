@@ -1,40 +1,46 @@
-import type { MetadataRoute } from "next";
+import { PrismaClient } from '@prisma/client'
 
-import { prisma } from "@/lib/prisma";
-import { SITE_URL } from "@/lib/site";
+export const dynamic = 'force-dynamic'
 
-export const dynamic = "force-dynamic";
+const prisma = new PrismaClient()
 
-const SECTIONS = ["geography", "economy", "government", "people-and-society", "military"] as const;
-
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+export default async function sitemap() {
   const countries = await prisma.country.findMany({
-    select: { slug: true, updatedAt: true },
-  });
+    select: { slug: true, updatedAt: true }
+  })
 
-  const entries: MetadataRoute.Sitemap = [
-    { url: SITE_URL + "/", lastModified: new Date(), changeFrequency: "weekly", priority: 1 },
-    { url: SITE_URL + "/rankings/", lastModified: new Date(), changeFrequency: "weekly", priority: 0.9 },
-    { url: SITE_URL + "/compare/", lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
-    { url: SITE_URL + "/ai-intel/", lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
-  ];
+  const countryUrls = countries.map((c) => ({
+    url: `https://worldfactbook.io/countries/${c.slug}/`,
+    lastModified: c.updatedAt,
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }))
 
-  for (const c of countries) {
-    entries.push({
-      url: `${SITE_URL}/countries/${c.slug}/`,
-      lastModified: c.updatedAt,
-      changeFrequency: "weekly",
-      priority: 0.85,
-    });
-    for (const s of SECTIONS) {
-      entries.push({
-        url: `${SITE_URL}/countries/${c.slug}/${s}/`,
-        lastModified: c.updatedAt,
-        changeFrequency: "weekly",
-        priority: 0.75,
-      });
-    }
-  }
-
-  return entries;
+  return [
+    {
+      url: 'https://worldfactbook.io/',
+      lastModified: new Date(),
+      changeFrequency: 'daily' as const,
+      priority: 1.0,
+    },
+    {
+      url: 'https://worldfactbook.io/countries/',
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.9,
+    },
+    {
+      url: 'https://worldfactbook.io/rankings/',
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.7,
+    },
+    {
+      url: 'https://worldfactbook.io/compare/',
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    },
+    ...countryUrls,
+  ]
 }
