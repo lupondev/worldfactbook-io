@@ -9,15 +9,15 @@ import { SITE_URL } from "@/lib/site";
 export const dynamic = "force-dynamic";
 
 const RANKINGS_DESCRIPTION =
-  "Sort 260+ countries by GDP, GDP per capita, population, HDI, democracy score, and corruption index — WorldFactbook.io.";
+  "Sort 260+ countries by GDP, GDP per capita, population, HDI, democracy score, and corruption — WorldFactbook.io.";
 
 export const metadata: Metadata = {
-  title: "Country Rankings - The World Factbook",
+  title: "World Rankings - World Factbook",
   description: RANKINGS_DESCRIPTION,
   alternates: { canonical: "/rankings/" },
   openGraph: {
-    title: "Country Rankings | WorldFactbook.io",
-    description: "Sortable rankings across key World Factbook indicators.",
+    title: "World Rankings | WorldFactbook.io",
+    description: RANKINGS_DESCRIPTION,
     url: `${SITE_URL}/rankings/`,
   },
 };
@@ -34,6 +34,7 @@ export default async function RankingsPage() {
       gdp: true,
       gdpPerCapita: true,
       population: true,
+      hdiRank: true,
       hdiScore: true,
       democracyScore: true,
       corruptionIndex: true,
@@ -58,11 +59,11 @@ export default async function RankingsPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Navbar />
       <main className="mx-auto max-w-6xl px-4 py-10 md:px-6">
-        <header className="mb-8 border-b border-bg4 pb-6">
-          <h1 className="font-display text-4xl text-cream">Country rankings</h1>
-          <p className="mt-2 max-w-2xl text-sm text-muted">
-            Click column headers to sort. Data is parsed from the CIA World Factbook JSON corpus; HDI, democracy, and
-            corruption fields are reserved for merged open datasets.
+        <header className="mb-10 border-b border-[0.5px] border-[color:var(--line)] pb-8">
+          <h1 className="font-display text-[36px] font-semibold text-cream">World Rankings</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
+            All countries and territories, sortable by headline indicators. Default view ranks by GDP (nominal). Use the
+            tabs to switch metrics; search filters the list client-side.
           </p>
         </header>
         <RankingsTable countries={countries} />

@@ -13,10 +13,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = params;
   const c = await prisma.country.findUnique({ where: { slug } });
   if (!c) return { title: "Country not found" };
-  const title = `${c.name} - The World Factbook`;
-  const description =
-    c.introduction?.slice(0, 155) ||
-    `${c.name}: geography, people, economy, government, and military — World Factbook format on WorldFactbook.io.`;
+  const title = `${c.name} - World Factbook`;
+  const description = `${c.name} country profile: GDP, population, government, geography and more.`;
   return {
     title,
     description,

@@ -5,16 +5,20 @@ import { useState } from "react";
 export function Collapsible({
   title,
   defaultOpen = false,
+  id,
+  className = "",
   children,
 }: {
   title: string;
   defaultOpen?: boolean;
+  id?: string;
+  className?: string;
   children: React.ReactNode;
 }) {
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <section className="rounded-lg border border-bg4 bg-bg2/60">
+    <section id={id} className={`scroll-mt-28 rounded-lg border-[0.5px] border-[color:var(--line)] bg-bg2/80 ${className}`}>
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}

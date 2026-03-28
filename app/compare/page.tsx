@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
 
-import { CompareClient } from "@/components/CompareClient";
+import { CompareClient, type CompareCountryRow } from "@/components/CompareClient";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
-import { toCountryPublic } from "@/lib/country-public";
 import { prisma } from "@/lib/prisma";
 import { SITE_URL } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
-const COMPARE_DESC = "Compare two countries side by side: GDP, population, HDI, democracy, and Factbook sections.";
+const COMPARE_DESC =
+  "Compare two to four countries: GDP, population, HDI rank, democracy, life expectancy, inflation, debt, and literacy.";
 
 export const metadata: Metadata = {
-  title: "Compare Countries - The World Factbook",
+  title: "Compare Countries - World Factbook",
   description: COMPARE_DESC,
   alternates: { canonical: "/compare/" },
   openGraph: {
@@ -22,30 +22,57 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function ComparePage({
-  searchParams,
-}: {
-  searchParams: { a?: string; b?: string };
-}) {
-  const options = await prisma.country.findMany({
+function buildInitialSlugs(slugs: string[], available: Set<string>): string[] {
+  const out: string[] = [];
+  for (const s of slugs) {
+    if (available.has(s) && !out.includes(s)) out.push(s);
+  }
+  if (out.length >= 2) return out.slice(0, 4);
+  for (const s of ["united-states", "germany", "france", "japan"]) {
+    if (available.has(s) && !out.includes(s)) out.push(s);
+    if (out.length >= 2) break;
+  }
+  return out.slice(0, 4);
+}
+
+export default async function ComparePage() {
+  const raw = await prisma.country.findMany({
     orderBy: { name: "asc" },
-    select: { slug: true, name: true, flag: true },
+    select: {
+      slug: true,
+      name: true,
+      flag: true,
+      gdp: true,
+      gdpPerCapita: true,
+      population: true,
+      area: true,
+      hdiRank: true,
+      democracyScore: true,
+      lifeExpectancy: true,
+      inflation: true,
+      publicDebt: true,
+      literacyRate: true,
+    },
   });
 
-  const resolve = (q: string | undefined, preferred: string, alt: string) => {
-    if (q && options.some((o) => o.slug === q)) return q;
-    if (options.some((o) => o.slug === preferred)) return preferred;
-    if (options.some((o) => o.slug === alt)) return alt;
-    return options[0]?.slug ?? preferred;
-  };
+  const countries: CompareCountryRow[] = raw.map((c) => ({
+    slug: c.slug,
+    name: c.name,
+    flag: c.flag,
+    gdp: c.gdp,
+    gdpPerCapita: c.gdpPerCapita,
+    population: c.population != null ? c.population.toString() : null,
+    area: c.area,
+    hdiRank: c.hdiRank,
+    democracyScore: c.democracyScore,
+    lifeExpectancy: c.lifeExpectancy,
+    inflation: c.inflation,
+    publicDebt: c.publicDebt,
+    literacyRate: c.literacyRate,
+  }));
 
-  const aSlug = resolve(searchParams.a, "germany", "united-states");
-  const bSlug = resolve(searchParams.b, "france", "japan");
-
-  const [left, right] = await Promise.all([
-    prisma.country.findUnique({ where: { slug: aSlug } }),
-    prisma.country.findUnique({ where: { slug: bSlug } }),
-  ]);
+  const available = new Set(countries.map((c) => c.slug));
+  const initialSlugs = buildInitialSlugs(["united-states", "germany"], available);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -59,18 +86,15 @@ export default async function ComparePage({
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Navbar />
-      <main className="mx-auto max-w-5xl px-4 py-10 md:px-6">
-        <header className="mb-8 border-b border-bg4 pb-6">
-          <h1 className="font-display text-4xl text-cream">Compare</h1>
-          <p className="mt-2 text-sm text-muted">Pick any two Factbook entities and compare headline indicators.</p>
+      <main className="mx-auto max-w-6xl px-4 py-10 md:px-6">
+        <header className="mb-10 border-b border-[0.5px] border-[color:var(--line)] pb-8">
+          <h1 className="font-display text-[36px] font-semibold text-cream">Compare Countries</h1>
+          <p className="mt-3 max-w-2xl text-sm text-muted">
+            Choose two to four countries, then run Compare to refresh the table. Best-in-row values are highlighted with a
+            gold outline.
+          </p>
         </header>
-        <CompareClient
-          options={options}
-          initialA={aSlug}
-          initialB={bSlug}
-          left={left ? toCountryPublic(left) : null}
-          right={right ? toCountryPublic(right) : null}
-        />
+        <CompareClient countries={countries} initialSlugs={initialSlugs} />
       </main>
       <Footer />
     </>
