@@ -2,7 +2,7 @@
  * Seed / upsert CIA Factbook JSON into Postgres.
  * 1) Tries https://raw.githubusercontent.com/factbook/factbook.json/master/index.json
  * 2) Falls back to GitHub tree listing + per-file raw fetch
- * 3) Enriches flags + ISO + capital + area via REST Countries
+ * 3) English display names + slugs from REST Countries when ISO matches; then flags + ISO + capital + area enrichment
  *
  * Run: npx ts-node scripts/seed-countries.ts
  * Or:  npm run seed:countries
@@ -21,8 +21,13 @@ import {
   iso2ToFlag,
   pickEconomyMetrics,
 } from "../lib/factbook/parse";
-import { fetchRestCountriesDataset, matchRestCountry } from "../lib/pipelines/restcountries";
+import {
+  englishFromRestCountry,
+  fetchRestCountriesDataset,
+  matchRestCountry,
+} from "../lib/pipelines/restcountries";
 import { createScriptPrismaClient } from "../lib/prisma-script";
+import { slugifyCountryName } from "../lib/slugify";
 
 const prisma = createScriptPrismaClient();
 
@@ -48,13 +53,6 @@ const REGIONS: Record<string, string> = {
   "south-asia": "South Asia",
   world: "World",
 };
-
-function slugify(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-}
 
 function mapRegionFolder(folder: string): string {
   return REGIONS[folder] || folder.replace(/-/g, " ");
@@ -160,6 +158,8 @@ async function main() {
 
   console.log(`Fetching ${entries.length} country JSON files…`);
 
+  const rcDataset = await fetchRestCountriesDataset();
+
   const slugCounts = new Map<string, number>();
 
   for (const { path, regionKey } of entries) {
@@ -172,18 +172,25 @@ async function main() {
     const ciaCode = pathToCiaCode(path);
     const gov = data.Government as Record<string, unknown> | undefined;
     const { short, long } = getCountryName(gov);
-    const name = short || long || ciaCode.toUpperCase();
-    const officialName = long && long !== short ? long : null;
-
-    let baseSlug = slugify(name);
-    if (!baseSlug) baseSlug = ciaCode;
-    const n = (slugCounts.get(baseSlug) || 0) + 1;
-    slugCounts.set(baseSlug, n);
-    const slug = n > 1 ? `${baseSlug}-${ciaCode}` : baseSlug;
+    let name = short || long || ciaCode.toUpperCase();
+    let officialName: string | null = long && long !== short ? long : null;
 
     const comm = data.Communications as Record<string, unknown> | undefined;
     const icc = comm?.["Internet country code"] as { text?: string } | undefined;
     const iso2 = internetTldToIso2(icc?.text);
+
+    const rcHit = matchRestCountry(rcDataset, { name, iso2, iso3: null });
+    if (rcHit) {
+      const en = englishFromRestCountry(rcHit);
+      name = en.common;
+      officialName = en.official !== en.common ? en.official : null;
+    }
+
+    let baseSlug = slugifyCountryName(name);
+    if (!baseSlug) baseSlug = ciaCode;
+    const n = (slugCounts.get(baseSlug) || 0) + 1;
+    slugCounts.set(baseSlug, n);
+    const slug = n > 1 ? `${baseSlug}-${ciaCode}` : baseSlug;
 
     const geo = data.Geography as Record<string, unknown> | undefined;
     const people = data["People and Society"] as Record<string, unknown> | undefined;
@@ -267,7 +274,7 @@ async function main() {
   console.log(`Upserted Factbook profiles. Total countries in DB: ${total}`);
 
   console.log("Enriching with REST Countries (flags, ISO, capital, area, population)…");
-  const rc = await fetchRestCountriesDataset();
+  const rc = rcDataset;
   const rows = await prisma.country.findMany();
   let enriched = 0;
   for (const c of rows) {

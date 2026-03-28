@@ -2,13 +2,14 @@ export type RestCountry = {
   name: { common: string; official: string };
   cca2: string;
   cca3: string;
-  flag: string;
+  flag?: string;
   capital?: string[];
   area?: number;
   population?: number;
   region?: string;
   subregion?: string;
   altSpellings?: string[];
+  translations?: Record<string, { official: string; common: string }>;
 };
 
 function norm(s: string): string {
@@ -33,10 +34,65 @@ function tokenOverlap(a: string, b: string): number {
 
 export async function fetchRestCountriesDataset(): Promise<RestCountry[]> {
   const url =
-    "https://restcountries.com/v3.1/all?fields=name,cca2,cca3,flag,capital,area,population,region,subregion,altSpellings";
+    "https://restcountries.com/v3.1/all?fields=name,cca2,cca3,flag,capital,area,population,region,subregion,altSpellings,translations";
   const res = await fetch(url);
   if (!res.ok) throw new Error(`REST Countries failed: ${res.status}`);
   return (await res.json()) as RestCountry[];
+}
+
+export async function fetchRestCountriesNameDataset(): Promise<RestCountry[]> {
+  const url = "https://restcountries.com/v3.1/all?fields=name,cca2,cca3,translations";
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`REST Countries failed: ${res.status}`);
+  return (await res.json()) as RestCountry[];
+}
+
+export function englishFromRestCountry(c: RestCountry): { common: string; official: string } {
+  const eng = c.translations?.eng;
+  if (eng?.common)
+    return { common: eng.common, official: eng.official && eng.official.length ? eng.official : eng.common };
+  return { common: c.name.common, official: c.name.official };
+}
+
+export type RestCountryLookup = {
+  byCca2: Map<string, RestCountry>;
+  byCca3: Map<string, RestCountry>;
+  byEnglishSlug: Map<string, RestCountry>;
+};
+
+export function buildRestCountryLookup(
+  all: RestCountry[],
+  slugify: (name: string) => string,
+): RestCountryLookup {
+  const byCca2 = new Map<string, RestCountry>();
+  const byCca3 = new Map<string, RestCountry>();
+  const byEnglishSlug = new Map<string, RestCountry>();
+  for (const c of all) {
+    if (c.cca2) byCca2.set(c.cca2.toUpperCase(), c);
+    if (c.cca3) byCca3.set(c.cca3.toUpperCase(), c);
+    const { common } = englishFromRestCountry(c);
+    const key = slugify(common);
+    if (key && !byEnglishSlug.has(key)) byEnglishSlug.set(key, c);
+  }
+  return { byCca2, byCca3, byEnglishSlug };
+}
+
+export function matchRestCountryToDbRow(
+  all: RestCountry[],
+  lookup: RestCountryLookup,
+  row: { name: string; slug: string; iso2: string | null; iso3: string | null },
+): RestCountry | null {
+  if (row.iso3) {
+    const x = lookup.byCca3.get(row.iso3.toUpperCase());
+    if (x) return x;
+  }
+  if (row.iso2) {
+    const x = lookup.byCca2.get(row.iso2.toUpperCase());
+    if (x) return x;
+  }
+  const bySlug = lookup.byEnglishSlug.get(row.slug);
+  if (bySlug) return bySlug;
+  return matchRestCountry(all, { name: row.name, iso2: row.iso2, iso3: row.iso3 });
 }
 
 /**
