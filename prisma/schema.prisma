@@ -31,6 +31,8 @@ model Country {
   democracyScore   Int?
   corruptionIndex  Int?
   publicDebt       Float?
+  imfCurrentAccountPct Float?
+  imfGovBalancePct     Float?
   lifeExpectancy   Float?
   literacyRate     Float?
   introduction     String?  @db.Text

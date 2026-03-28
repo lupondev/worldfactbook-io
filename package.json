@@ -11,9 +11,11 @@
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",
     "vercel-build": "prisma migrate deploy && prisma generate && next build",
-    "seed:countries": "ts-node --project tsconfig.seed.json scripts/seed-countries.ts"
+    "seed:countries": "ts-node --project tsconfig.seed.json scripts/seed-countries.ts",
+    "generate:ai-summaries": "ts-node --project tsconfig.seed.json scripts/generate-ai-summaries.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.80.0",
     "@prisma/client": "5.22.0",
     "next": "14.2.35",
     "react": "^18",
