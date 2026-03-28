@@ -29,6 +29,9 @@ export function Navbar() {
           <Link className="hover:text-gold transition-colors" href="/api-docs/">
             API
           </Link>
+          <Link className="hover:text-gold transition-colors" href="/blog/">
+            Blog
+          </Link>
         </nav>
         <Link
           href="/api-docs/"
