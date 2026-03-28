@@ -14,7 +14,7 @@ export function Navbar() {
           </span>
         </Link>
         <nav className="hidden items-center gap-6 text-sm text-cream/90 md:flex">
-          <Link className="hover:text-gold transition-colors" href="/countries/united-states/">
+          <Link className="hover:text-gold transition-colors" href="/countries/">
             Countries
           </Link>
           <Link className="hover:text-gold transition-colors" href="/rankings/">
@@ -23,15 +23,15 @@ export function Navbar() {
           <Link className="hover:text-gold transition-colors" href="/compare/">
             Compare
           </Link>
-          <Link className="hover:text-gold transition-colors" href="/ai-intel/">
+          <Link className="hover:text-gold transition-colors" href="/countries/?ai=1">
             AI Intel
           </Link>
-          <Link className="hover:text-gold transition-colors" href="/api/v1/countries/">
+          <Link className="hover:text-gold transition-colors" href="/api-docs/">
             API
           </Link>
         </nav>
         <Link
-          href="/api/v1/countries/"
+          href="/api-docs/"
           className="shrink-0 rounded border-2 border-gold px-3 py-2 font-mono text-xs font-bold uppercase tracking-wide text-gold transition-colors hover:bg-gold/10"
         >
           Free API →

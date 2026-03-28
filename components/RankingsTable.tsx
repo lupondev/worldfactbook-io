@@ -110,6 +110,15 @@ export function RankingsTable({ countries }: { countries: RankingsRow[] }) {
     return m || 1;
   }, [sorted, tab]);
 
+  function barWidthPct(v: number | null): number {
+    if (v == null || !Number.isFinite(v) || maxVal <= 0) return 0;
+    if (tab === "hdi") {
+      const inv = 1 - (Math.abs(v) - 1) / maxVal;
+      return Math.max(0, Math.min(100, inv * 100));
+    }
+    return Math.min(100, (Math.abs(v) / maxVal) * 100);
+  }
+
   return (
     <div className="space-y-6">
       <div
@@ -158,7 +167,7 @@ export function RankingsTable({ countries }: { countries: RankingsRow[] }) {
           <tbody>
             {sorted.map(({ c, rank }) => {
               const v = tabValue(c, tab);
-              const pct = v != null && maxVal > 0 ? (Math.abs(v) / maxVal) * 100 : 0;
+              const pct = barWidthPct(v);
               return (
                 <tr
                   key={c.id}

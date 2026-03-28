@@ -143,7 +143,10 @@ function SlotPicker({
           setQ(e.target.value);
           setOpen(true);
         }}
-        onFocus={() => setOpen(true)}
+        onFocus={() => {
+          setOpen(true);
+          setQ((prev) => prev || selected?.name || "");
+        }}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
         placeholder="Search country…"
         className="w-full rounded border-[0.5px] border-[color:var(--line)] bg-bg3 px-3 py-2 text-sm text-cream placeholder:text-muted focus:border-gold focus:outline-none"
@@ -189,7 +192,6 @@ export function CompareClient({
   const [draftSlugs, setDraftSlugs] = useState<string[]>(() => initialSlugs.slice(0, 4));
   const [activeSlugs, setActiveSlugs] = useState<string[]>(() => initialSlugs.slice(0, 4));
 
-  const resolvedDraft = draftSlugs.map((s) => bySlug.get(s)).filter(Boolean) as CompareCountryRow[];
   const resolvedActive = activeSlugs.map((s) => bySlug.get(s)).filter(Boolean) as CompareCountryRow[];
 
   const setSlot = useCallback((index: number, slug: string) => {
