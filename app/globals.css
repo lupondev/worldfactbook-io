@@ -3,25 +3,70 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #05101d;
+  --bg2: #091826;
+  --bg3: #0f2035;
+  --bg4: #162840;
+  --cream: #ede7d9;
+  --muted: #8e8880;
+  --gold: #e8a83c;
+  --gold2: #f2c060;
+  --live: #22d47a;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: dark;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  @apply bg-bg text-cream font-sans antialiased min-h-screen;
+  background-color: var(--bg);
+  color: var(--cream);
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+.scanlines::before {
+  content: "";
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  opacity: 0.06;
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.45) 2px,
+    rgba(0, 0, 0, 0.45) 4px
+  );
+}
+
+@keyframes pulse-live {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
   }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.92);
+  }
+}
+
+.live-dot {
+  animation: pulse-live 1.6s ease-in-out infinite;
+}
+
+@keyframes blink-cursor {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.terminal-cursor {
+  animation: blink-cursor 1s step-end infinite;
 }

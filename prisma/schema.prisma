@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Country {
+  id               String   @id @default(cuid())
+  slug             String   @unique
+  ciaCode          String   @unique
+  name             String
+  officialName     String?
+  region           String
+  subregion        String?
+  flag             String
+  iso2             String?
+  iso3             String?
+  capital          String?
+  area             Float?
+  population       BigInt?
+  gdp              Float?
+  gdpPerCapita     Float?
+  gdpGrowth        Float?
+  inflation        Float?
+  unemployment     Float?
+  hdiRank          Int?
+  hdiScore         Float?
+  democracyScore   Int?
+  corruptionIndex  Int?
+  publicDebt       Float?
+  lifeExpectancy   Float?
+  literacyRate     Float?
+  introduction     String?  @db.Text
+  geography        Json?
+  peopleAndSociety Json?
+  government       Json?
+  economy          Json?
+  energy           Json?
+  communications   Json?
+  transportation   Json?
+  military         Json?
+  aiSummary        String?  @db.Text
+  aiUpdatedAt      DateTime?
+  dataUpdatedAt    DateTime @default(now())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model DataSource {
+  id       String   @id @default(cuid())
+  name     String
+  lastSync DateTime
+  status   String
+}
