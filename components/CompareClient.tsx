@@ -190,9 +190,18 @@ export function CompareClient({
   const bySlug = useMemo(() => new Map(countries.map((c) => [c.slug, c])), [countries]);
 
   const [draftSlugs, setDraftSlugs] = useState<string[]>(() => initialSlugs.slice(0, 4));
-  const [activeSlugs, setActiveSlugs] = useState<string[]>(() => initialSlugs.slice(0, 4));
 
-  const resolvedActive = activeSlugs.map((s) => bySlug.get(s)).filter(Boolean) as CompareCountryRow[];
+  const resolvedRows = useMemo(() => {
+    const seen = new Set<string>();
+    const out: CompareCountryRow[] = [];
+    for (const s of draftSlugs) {
+      const row = bySlug.get(s);
+      if (!row || seen.has(s)) continue;
+      seen.add(s);
+      out.push(row);
+    }
+    return out;
+  }, [draftSlugs, bySlug]);
 
   const setSlot = useCallback((index: number, slug: string) => {
     setDraftSlugs((prev) => {
@@ -215,9 +224,16 @@ export function CompareClient({
   };
 
   const runCompare = () => {
-    const next = draftSlugs.filter((s, i, a) => bySlug.has(s) && a.indexOf(s) === i);
-    if (next.length < 2) return;
-    setActiveSlugs(next.slice(0, 4));
+    setDraftSlugs((prev) => {
+      const next: string[] = [];
+      const seen = new Set<string>();
+      for (const s of prev) {
+        if (!bySlug.has(s) || seen.has(s)) continue;
+        seen.add(s);
+        next.push(s);
+      }
+      return next.length >= 2 ? next.slice(0, 4) : prev;
+    });
   };
 
   return (
@@ -259,16 +275,19 @@ export function CompareClient({
         ) : null}
       </div>
 
-      {resolvedActive.length < 2 ? (
+      {resolvedRows.length < 2 ? (
         <p className="text-sm text-muted">Select at least two valid countries and press Compare.</p>
       ) : (
         <div className="overflow-x-auto rounded-lg border-[0.5px] border-[color:var(--line)] bg-bg2">
-          <table className="w-full min-w-[480px] border-collapse text-sm">
+          <table
+            className="w-full border-collapse text-sm"
+            style={{ minWidth: Math.max(480, 100 + resolvedRows.length * 148) }}
+          >
             <thead>
               <tr className="border-b border-[color:var(--line)] bg-bg3">
                 <th className="px-3 py-3 text-left font-mono text-[9px] uppercase tracking-widest text-muted">Metric</th>
-                {resolvedActive.map((c) => (
-                  <th key={c.slug} className="px-3 py-3 text-left">
+                {resolvedRows.map((c, i) => (
+                  <th key={`${c.slug}-${i}`} className="min-w-[132px] whitespace-nowrap px-3 py-3 text-left">
                     <Link href={`/countries/${c.slug}/`} className="font-display text-base text-cream hover:text-gold">
                       {c.flag} {c.name}
                     </Link>
@@ -278,7 +297,7 @@ export function CompareClient({
             </thead>
             <tbody>
               {ROWS.map((row) => {
-                const nums = resolvedActive.map((c) => row.numeric(c));
+                const nums = resolvedRows.map((c) => row.numeric(c));
                 const winners = bestIndices(nums, row.prefer);
                 const barMax = Math.max(...nums.map((n) => (n != null ? Math.abs(n) : 0)), 1);
                 return (
@@ -286,14 +305,14 @@ export function CompareClient({
                     <th className="px-3 py-3 text-left font-mono text-[10px] uppercase tracking-wide text-muted">
                       {row.label}
                     </th>
-                    {resolvedActive.map((c, colIdx) => {
+                    {resolvedRows.map((c, colIdx) => {
                       const n = nums[colIdx];
                       const pct = n != null ? (Math.abs(n) / barMax) * 100 : 0;
                       const isBest = winners.has(colIdx);
                       return (
                         <td
-                          key={c.slug}
-                          className={`px-3 py-3 align-top ${isBest ? "rounded-sm ring-1 ring-gold ring-offset-2 ring-offset-bg2" : ""}`}
+                          key={`${c.slug}-${colIdx}`}
+                          className={`min-w-[132px] px-3 py-3 align-top ${isBest ? "rounded-sm ring-1 ring-gold ring-offset-2 ring-offset-bg2" : ""}`}
                         >
                           <div className="font-mono text-sm text-cream">{row.format(c)}</div>
                           <div className="mt-2 h-1 w-full max-w-[120px] overflow-hidden rounded-full bg-bg">

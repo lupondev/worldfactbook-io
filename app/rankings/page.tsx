@@ -24,6 +24,7 @@ export const metadata: Metadata = {
 
 export default async function RankingsPage() {
   const raw = await prisma.country.findMany({
+    where: { NOT: { OR: [{ slug: "world" }, { name: "World" }] } },
     orderBy: { name: "asc" },
     select: {
       id: true,

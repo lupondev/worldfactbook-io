@@ -90,8 +90,8 @@ export default async function ComparePage() {
         <header className="mb-10 border-b border-[0.5px] border-[color:var(--line)] pb-8">
           <h1 className="font-display text-[36px] font-semibold text-cream">Compare Countries</h1>
           <p className="mt-3 max-w-2xl text-sm text-muted">
-            Choose two to four countries, then run Compare to refresh the table. Best-in-row values are highlighted with a
-            gold outline.
+            Choose two to four countries; the table lists every selected country as a column. Use Compare to drop duplicates
+            and invalid picks. Best-in-row values use a gold outline.
           </p>
         </header>
         <CompareClient countries={countries} initialSlugs={initialSlugs} />
