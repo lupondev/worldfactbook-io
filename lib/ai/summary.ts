@@ -40,3 +40,15 @@ Be factual, neutral, intelligence-style writing. No fluff. Max 150 words total.`
   const block = response.content[0];
   return block.type === "text" ? block.text : "";
 }
+
+/** Short plain-text brief from Factbook fields when no LLM key is available (e.g. CI). */
+export function heuristicCountrySummary(country: Country): string {
+  const bits: string[] = [`${country.name} (${country.region})`];
+  if (country.capital) bits.push(`Capital: ${country.capital}`);
+  if (country.population != null) bits.push(`Population ~${fmtNum(country.population)}`);
+  if (country.gdp != null) bits.push(`GDP ~$${fmtNum(country.gdp)}B`);
+  if (country.gdpPerCapita != null) bits.push(`GDP per capita ~$${fmtNum(country.gdpPerCapita)}`);
+  const intro = country.introduction?.trim();
+  if (intro) bits.push(intro.length > 900 ? `${intro.slice(0, 897)}…` : intro);
+  return bits.join(". ") + ".";
+}

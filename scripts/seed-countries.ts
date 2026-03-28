@@ -8,7 +8,6 @@
  * Or:  npm run seed:countries
  */
 import "dotenv/config";
-import { PrismaClient } from "@prisma/client";
 
 import {
   getAreaTotal,
@@ -23,11 +22,15 @@ import {
   pickEconomyMetrics,
 } from "../lib/factbook/parse";
 import { fetchRestCountriesDataset, matchRestCountry } from "../lib/pipelines/restcountries";
+import { createScriptPrismaClient } from "../lib/prisma-script";
 
-const prisma = new PrismaClient();
+const prisma = createScriptPrismaClient();
 
 const RAW_BASE = "https://raw.githubusercontent.com/factbook/factbook.json/master";
-const INDEX_URL = `${RAW_BASE}/index.json`;
+const INDEX_URLS = [
+  `${RAW_BASE}/index.json`,
+  "https://raw.githubusercontent.com/factbook/factbook.json/main/index.json",
+];
 const TREE_URL = "https://api.github.com/repos/factbook/factbook.json/git/trees/master?recursive=1";
 
 const REGIONS: Record<string, string> = {
@@ -84,14 +87,19 @@ function normalizeIndexJson(j: unknown): string[] | null {
 }
 
 async function loadPathsFromIndex(): Promise<string[] | null> {
-  try {
-    const res = await fetch(INDEX_URL);
-    if (!res.ok) return null;
-    const j = (await res.json()) as unknown;
-    const paths = normalizeIndexJson(j);
-    if (paths?.length) return paths;
-  } catch {
-    /* fall through */
+  for (const INDEX_URL of INDEX_URLS) {
+    try {
+      const res = await fetch(INDEX_URL);
+      if (!res.ok) continue;
+      const j = (await res.json()) as unknown;
+      const paths = normalizeIndexJson(j);
+      if (paths?.length) {
+        console.log(`Loaded ${paths.length} paths from ${INDEX_URL}`);
+        return paths;
+      }
+    } catch {
+      /* try next */
+    }
   }
   return null;
 }
@@ -143,8 +151,6 @@ async function main() {
   if (!relPaths?.length) {
     console.log("index.json missing or empty — building file list from GitHub tree API…");
     relPaths = await loadPathsFromGithubTree();
-  } else {
-    console.log(`Loaded ${relPaths.length} paths from index.json`);
   }
 
   const entries: IndexEntry[] = relPaths.map((path) => ({
