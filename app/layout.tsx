@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Sans, Playfair_Display, Space_Mono } from "next/font/google";
-import Script from "next/script";
 
+import GoogleAnalytics from "./components/GoogleAnalytics";
 import "./globals.css";
 
 import { SITE_NAME, SITE_URL } from "@/lib/site";
@@ -59,21 +59,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${playfair.variable} ${dmSans.variable} ${spaceMono.variable}`}>
-      <body className="scanlines">
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-VRQE378M0X"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-VRQE378M0X');
-  `}
-        </Script>
-        {children}
-      </body>
+      <head>
+        <GoogleAnalytics />
+      </head>
+      <body className="scanlines">{children}</body>
     </html>
   );
 }
