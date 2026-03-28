@@ -1,8 +1,15 @@
+import Script from "next/script";
+
 export default function GoogleAnalytics() {
   return (
     <>
-      <script async src="https://www.googletagmanager.com/gtag/js?id=G-VRQE378M0X" />
-      <script
+      <Script
+        src="https://www.googletagmanager.com/gtag/js?id=G-VRQE378M0X"
+        strategy="afterInteractive"
+      />
+      <Script
+        id="ga-gtag"
+        strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
             window.dataLayer = window.dataLayer || [];

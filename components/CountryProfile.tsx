@@ -1,3 +1,4 @@
+import dynamic from "next/dynamic";
 import Link from "next/link";
 
 import type { Country } from "@prisma/client";
@@ -11,6 +12,18 @@ import { KeyMetricsGrid } from "@/components/profile/KeyMetricsGrid";
 import { ProfileHero } from "@/components/profile/ProfileHero";
 import { ProfileSidebar } from "@/components/profile/ProfileSidebar";
 import { formatDaysAgo } from "@/lib/format";
+
+const ProfileCollapsibleSections = dynamic(
+  () => import("@/components/profile/ProfileCollapsibleSections").then((m) => m.ProfileCollapsibleSections),
+  {
+    loading: () => (
+      <div className="space-y-3" aria-hidden>
+        <div className="h-14 animate-pulse rounded-lg border-[0.5px] border-[color:var(--line)] bg-bg3/40" />
+        <div className="h-14 animate-pulse rounded-lg border-[0.5px] border-[color:var(--line)] bg-bg3/40" />
+      </div>
+    ),
+  },
+);
 
 export type CountryFocus =
   | "main"
@@ -55,41 +68,14 @@ export function CountryProfile({ country, focus = "main" }: { country: Country; 
                 </section>
               </div>
 
-              {country.geography ? (
-                <Collapsible id="geography" title="Geography" defaultOpen={false}>
-                  <FactJson value={country.geography} />
-                </Collapsible>
-              ) : null}
-
-              {country.economy ? (
-                <Collapsible id="economy" title="Economy" defaultOpen={false}>
-                  <FactJson value={country.economy} />
-                </Collapsible>
-              ) : null}
-
-              {country.government ? (
-                <Collapsible id="government" title="Government" defaultOpen={false}>
-                  <FactJson value={country.government} />
-                </Collapsible>
-              ) : null}
-
-              {country.peopleAndSociety ? (
-                <Collapsible id="people" title="People & Society" defaultOpen={false}>
-                  <FactJson value={country.peopleAndSociety} />
-                </Collapsible>
-              ) : null}
-
-              {country.military ? (
-                <Collapsible id="military" title="Military" defaultOpen={false}>
-                  <FactJson value={country.military} />
-                </Collapsible>
-              ) : null}
-
-              {country.energy ? (
-                <Collapsible id="energy" title="Energy" defaultOpen={false}>
-                  <FactJson value={country.energy} />
-                </Collapsible>
-              ) : null}
+              <ProfileCollapsibleSections
+                geography={country.geography}
+                economy={country.economy}
+                government={country.government}
+                peopleAndSociety={country.peopleAndSociety}
+                military={country.military}
+                energy={country.energy}
+              />
             </div>
           </div>
 

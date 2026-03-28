@@ -1,3 +1,12 @@
+* {
+  text-rendering: optimizeSpeed;
+}
+
+img,
+video {
+  max-width: 100%;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -39,6 +48,12 @@ body {
     rgba(0, 0, 0, 0.45) 2px,
     rgba(0, 0, 0, 0.45) 4px
   );
+}
+
+@media (max-width: 768px) {
+  .scanlines::before {
+    display: none;
+  }
 }
 
 @keyframes pulse-live {

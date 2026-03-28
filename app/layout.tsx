@@ -64,10 +64,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${playfair.variable} ${dmSans.variable} ${spaceMono.variable}`}>
-      <head>
+      <body className="scanlines">
         <GoogleAnalytics />
-      </head>
-      <body className="scanlines">{children}</body>
+        {children}
+      </body>
     </html>
   );
 }
