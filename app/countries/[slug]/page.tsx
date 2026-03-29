@@ -35,11 +35,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     `${c.name} country data 2026`,
     `${c.name} CIA factbook alternative`,
   ];
+  const canonical = `https://worldfactbook.io/countries/${slug}/`;
+  const thinPage =
+    !c.introduction?.trim() && !c.aiSummary?.trim() && c.gdp === null;
   return {
     title,
     description,
     keywords,
-    alternates: { canonical: `/countries/${c.slug}/` },
+    alternates: { canonical },
+    ...(thinPage ? { robots: { index: false, follow: true } } : {}),
     openGraph: {
       title: `${c.name} | WorldFactbook.io`,
       description,

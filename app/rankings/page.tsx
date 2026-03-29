@@ -14,7 +14,7 @@ const RANKINGS_DESCRIPTION =
 export const metadata: Metadata = {
   title: "World Rankings - World Factbook",
   description: RANKINGS_DESCRIPTION,
-  alternates: { canonical: "/rankings/" },
+  alternates: { canonical: "https://worldfactbook.io/rankings/" },
   openGraph: {
     title: "World Rankings | WorldFactbook.io",
     description: RANKINGS_DESCRIPTION,

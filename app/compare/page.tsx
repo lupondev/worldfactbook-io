@@ -14,7 +14,7 @@ const COMPARE_DESC =
 export const metadata: Metadata = {
   title: "Compare Countries - World Factbook",
   description: COMPARE_DESC,
-  alternates: { canonical: "/compare/" },
+  alternates: { canonical: "https://worldfactbook.io/compare/" },
   openGraph: {
     title: "Compare countries | WorldFactbook.io",
     description: COMPARE_DESC,

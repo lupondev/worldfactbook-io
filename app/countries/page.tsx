@@ -13,7 +13,7 @@ const DESC = "Browse all countries and territories in World Factbook format — 
 export const metadata: Metadata = {
   title: "Countries - World Factbook",
   description: DESC,
-  alternates: { canonical: "/countries/" },
+  alternates: { canonical: "https://worldfactbook.io/countries/" },
   openGraph: {
     title: "Countries | WorldFactbook.io",
     description: DESC,
