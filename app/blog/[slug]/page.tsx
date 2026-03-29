@@ -6,6 +6,7 @@ import { BlogMarkdown } from "@/components/BlogMarkdown";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { getAllPosts, getPostBySlug, getRelatedPosts } from "@/lib/blog";
+import { resolveFeaturedImage } from "@/lib/featured-image";
 import { SITE_URL } from "@/lib/site";
 
 type Props = { params: { slug: string } };
@@ -18,6 +19,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = getPostBySlug(params.slug);
   if (!post) return { title: "Post not found" };
   const url = `${SITE_URL}/blog/${post.slug}/`;
+  const featured = await resolveFeaturedImage({
+    sourceUrl: post.sourceUrl,
+    title: post.title,
+    description: post.description,
+  });
   return {
     title: post.title,
     description: post.description,
@@ -28,21 +34,28 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: post.description,
       url,
       publishedTime: post.date,
+      images: [{ url: featured.url }],
     },
     twitter: {
       card: "summary_large_image",
       title: post.title,
       description: post.description,
+      images: [featured.url],
     },
   };
 }
 
-export default function BlogArticlePage({ params }: Props) {
+export default async function BlogArticlePage({ params }: Props) {
   const post = getPostBySlug(params.slug);
   if (!post) notFound();
 
   const related = getRelatedPosts(post.slug, post.tags, 3);
   const url = `${SITE_URL}/blog/${post.slug}/`;
+  const featured = await resolveFeaturedImage({
+    sourceUrl: post.sourceUrl,
+    title: post.title,
+    description: post.description,
+  });
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -51,6 +64,7 @@ export default function BlogArticlePage({ params }: Props) {
     description: post.description,
     datePublished: post.date,
     dateModified: post.date,
+    image: featured.url,
     author: {
       "@type": "Organization",
       name: "WorldFactbook.io",

@@ -10,6 +10,7 @@ export type BlogFrontmatter = {
   description: string;
   slug: string;
   tags: string[];
+  sourceUrl?: string;
 };
 
 export type BlogPostMeta = BlogFrontmatter;
@@ -28,12 +29,14 @@ function parseFile(file: string): { meta: BlogFrontmatter; content: string } {
   const fileSlug = file.replace(/\.md$/i, "");
   const slug = typeof d.slug === "string" && d.slug ? d.slug : fileSlug;
   const tags = Array.isArray(d.tags) ? d.tags.filter((t): t is string => typeof t === "string") : [];
+  const sourceUrl = typeof d.sourceUrl === "string" && d.sourceUrl.trim() ? d.sourceUrl.trim() : undefined;
   const meta: BlogFrontmatter = {
     title: String(d.title ?? ""),
     date: String(d.date ?? ""),
     description: String(d.description ?? ""),
     slug,
     tags,
+    ...(sourceUrl ? { sourceUrl } : {}),
   };
   return { meta, content };
 }
