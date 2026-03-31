@@ -2,11 +2,10 @@ import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { WatchdogStatus } from "@/components/newsroom/WatchdogStatus";
 
-export const dynamic = "force-dynamic";
-
 export default function NewsroomPage() {
   const todayCount = 0;
   const dailyTarget = 24;
+  const checkedAt = "Checking...";
   return (
     <>
       <Navbar />
@@ -25,7 +24,7 @@ export default function NewsroomPage() {
             <p className="mt-2 font-display text-lg text-gold">ACTIVE</p>
             <p className="mt-1 font-mono text-xs text-muted">2h reporting cadence</p>
           </div>
-          <WatchdogStatus status="healthy" checkedAt={new Date().toISOString()} />
+          <WatchdogStatus status="healthy" checkedAt={checkedAt} />
         </div>
       </main>
       <Footer />
