@@ -1,6 +1,7 @@
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { AutopilotStatusBar } from "@/components/newsroom/AutopilotStatusBar";
+import { NewsroomClusters } from "@/components/newsroom/NewsroomClusters";
 import { WatchdogStatus } from "@/components/newsroom/WatchdogStatus";
 
 export default function NewsroomPage() {
@@ -15,6 +16,7 @@ export default function NewsroomPage() {
           <AutopilotStatusBar isActive={false} todayCount={todayCount} dailyTarget={dailyTarget} />
           <WatchdogStatus status="healthy" checkedAt="Checking..." />
         </div>
+        <NewsroomClusters />
       </main>
       <Footer />
     </>
