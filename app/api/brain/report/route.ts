@@ -18,8 +18,8 @@ export async function GET() {
   } catch (e) {
     console.error("[brain/report]", e);
     if (isMissingTableError(e)) {
-      return NextResponse.json({ reports: [], message: "Migration pending", data: [] });
+      return NextResponse.json({ reports: [], message: "Migration pending" });
     }
-    return NextResponse.json({ reports: [], message: "Migration pending", error: (e as { message?: string })?.message ?? "Failed" });
+    return NextResponse.json({ reports: [], message: "Migration pending" });
   }
 }
