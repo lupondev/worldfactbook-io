@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { isMissingTableError } from "@/lib/api-db";
 import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
@@ -14,8 +15,11 @@ export async function GET() {
        limit 20`,
     );
     return NextResponse.json({ ok: true, logs });
-  } catch {
-    return NextResponse.json({ ok: true, logs: [] });
+  } catch (error) {
+    if (isMissingTableError(error)) {
+      return NextResponse.json({ ok: true, logs: [], message: "Migration pending" });
+    }
+    return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
 }
 
@@ -36,6 +40,9 @@ export async function POST(request: Request) {
     );
     return NextResponse.json({ ok: true });
   } catch (err) {
+    if (isMissingTableError(err)) {
+      return NextResponse.json({ ok: true, logs: [], message: "Migration pending" });
+    }
     return NextResponse.json({ ok: false, error: String(err) }, { status: 500 });
   }
 }
