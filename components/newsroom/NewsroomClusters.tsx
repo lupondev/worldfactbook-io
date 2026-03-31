@@ -13,19 +13,21 @@ type TimeFilter = "24H" | "ALL";
 type CategoryFilter = "ANALYSIS" | "NEWS" | "TRANSFERS";
 
 function byCategory(list: Cluster[], filter: CategoryFilter): Cluster[] {
+  const normalized = list.map((item) => ({ ...item, category: item.category.toUpperCase() }));
+  const nonTransfer = normalized.filter((item) => !item.category.includes("TRANSFER") && !item.category.includes("OFF.TOPIC"));
   if (filter === "ANALYSIS") {
-    return list.filter((item) => {
-      const c = item.category.toUpperCase();
-      return c.includes("ANALYSIS") || c.includes("ECONOMY") || c.includes("GOVERNMENT");
+    const analysis = normalized.filter((item) => {
+      return item.category.includes("ANALYSIS") || item.category.includes("ECONOMY") || item.category.includes("GOVERNMENT");
     });
+    return analysis.length > 0 ? analysis : nonTransfer;
   }
   if (filter === "TRANSFERS") {
-    return list.filter((item) => item.category.toUpperCase().includes("TRANSFER"));
+    return normalized.filter((item) => item.category.includes("TRANSFER"));
   }
-  return list.filter((item) => {
-    const c = item.category.toUpperCase();
-    return !c.includes("TRANSFER") && !c.includes("OFF.TOPIC");
+  const news = normalized.filter((item) => {
+    return item.category.includes("NEWS") || item.category.includes("BREAKING") || item.category.includes("UPDATE");
   });
+  return news.length > 0 ? news : nonTransfer;
 }
 
 export function NewsroomClusters() {
@@ -45,9 +47,20 @@ export function NewsroomClusters() {
           setLoading(false);
           return;
         }
-        const payload = (await res.json()) as { clusters?: Cluster[] };
-        if (Array.isArray(payload.clusters)) {
-          setClusters(payload.clusters);
+        const payload = (await res.json()) as {
+          clusters?: Cluster[];
+          data?: { clusters?: Cluster[] };
+          items?: Cluster[];
+        };
+        const nextClusters = Array.isArray(payload.clusters)
+          ? payload.clusters
+          : Array.isArray(payload.data?.clusters)
+            ? payload.data.clusters
+            : Array.isArray(payload.items)
+              ? payload.items
+              : null;
+        if (Array.isArray(nextClusters)) {
+          setClusters(nextClusters);
           setError("");
         }
       } catch (e) {
