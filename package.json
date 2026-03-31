@@ -13,7 +13,8 @@
     "vercel-build": "prisma migrate deploy && prisma generate && next build",
     "seed:countries": "ts-node --project tsconfig.seed.json scripts/seed-countries.ts",
     "fix:country-names": "ts-node --transpile-only --project tsconfig.seed.json scripts/fix-country-names.ts",
-    "generate:ai-summaries": "ts-node --project tsconfig.seed.json scripts/generate-ai-summaries.ts"
+    "generate:ai-summaries": "ts-node --project tsconfig.seed.json scripts/generate-ai-summaries.ts",
+    "fix:proxy-urls": "ts-node --skip-project --transpile-only --compiler-options '{\"module\":\"CommonJS\",\"moduleResolution\":\"node\"}' -r dotenv/config -r tsconfig-paths/register scripts/fix-proxy-urls.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",
@@ -43,6 +44,7 @@
     "prisma": "5.22.0",
     "tailwindcss": "^3.4.1",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5"
   }
 }
