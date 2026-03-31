@@ -124,9 +124,7 @@ export function NewsroomClusters() {
         </button>
       </div>
 
-      <p className="mt-4 font-mono text-xs text-muted">
-        {loading ? "Checking..." : `${filtered.length} stories`}
-      </p>
+      <p className="mt-4 font-mono text-xs text-muted">{`${filtered.length} stories`}</p>
       {error ? <p className="mt-1 font-mono text-xs text-gold">{error}</p> : null}
 
       {filtered.length === 0 && !loading ? (
