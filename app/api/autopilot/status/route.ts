@@ -52,9 +52,13 @@ export async function GET() {
       remaining: Math.max(0, dailyTarget - todayCount),
     });
   } catch (error) {
+    console.error("[autopilot/status]", error);
     if (isMissingTableError(error)) {
       return NextResponse.json(fallback);
     }
-    return NextResponse.json({ error: "Failed" }, { status: 500 });
+    return NextResponse.json({
+      ...fallback,
+      error: (error as { message?: string })?.message ?? "Failed",
+    });
   }
 }

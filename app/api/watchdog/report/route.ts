@@ -19,10 +19,11 @@ export async function GET() {
       status: "healthy",
       checks,
     });
-  } catch (err) {
-    if (isMissingTableError(err)) {
-      return NextResponse.json({ status: "pending_migration", checks: [], message: "Migration pending", data: [] });
+  } catch (e) {
+    console.error("[watchdog]", e);
+    if (isMissingTableError(e)) {
+      return NextResponse.json({ status: "pending_migration", checks: [], error: (e as { message?: string })?.message ?? "" });
     }
-    return NextResponse.json({ error: "Failed" }, { status: 500 });
+    return NextResponse.json({ status: "pending_migration", checks: [], error: (e as { message?: string })?.message ?? "" });
   }
 }

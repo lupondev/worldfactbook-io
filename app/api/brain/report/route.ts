@@ -15,10 +15,11 @@ export async function GET() {
        limit 20`,
     );
     return NextResponse.json({ ok: true, reports });
-  } catch (err) {
-    if (isMissingTableError(err)) {
+  } catch (e) {
+    console.error("[brain/report]", e);
+    if (isMissingTableError(e)) {
       return NextResponse.json({ reports: [], message: "Migration pending", data: [] });
     }
-    return NextResponse.json({ error: "Failed" }, { status: 500 });
+    return NextResponse.json({ reports: [], message: "Migration pending", error: (e as { message?: string })?.message ?? "Failed" });
   }
 }
