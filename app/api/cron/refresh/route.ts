@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { decideArticle } from "@/lib/ai-editor/decision-engine";
 import { runWeeklyDataRefresh } from "@/lib/pipelines/refresh-cron";
 import { prisma } from "@/lib/prisma";
 
@@ -16,7 +17,13 @@ export async function GET(request: Request) {
 
   try {
     const stats = await runWeeklyDataRefresh(prisma);
-    return NextResponse.json({ ok: true, stats });
+    const decision = decideArticle({
+      title: "weekly refresh pipeline report",
+      source: "cron",
+      publishedAt: new Date().toISOString(),
+      clusterScore: 65,
+    });
+    return NextResponse.json({ ok: true, stats, decision });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ ok: false, error: String(e) }, { status: 500 });

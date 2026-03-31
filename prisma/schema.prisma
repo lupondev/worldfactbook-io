@@ -57,3 +57,39 @@ model DataSource {
   lastSync DateTime
   status   String
 }
+
+model AutopilotLog {
+  id         String   @id @default(cuid())
+  runType    String
+  status     String
+  message    String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+}
+
+model BrainReport {
+  id         String   @id @default(cuid())
+  status     String
+  summary    String?
+  report     Json?
+  createdAt  DateTime @default(now())
+}
+
+model BlacklistedSource {
+  id         String   @id @default(cuid())
+  source     String   @unique
+  reason     String?
+  createdAt  DateTime @default(now())
+}
+
+model ArticlePerformance {
+  id           String   @id @default(cuid())
+  articleId    String?
+  slug         String?
+  views        Int      @default(0)
+  ctr          Float?
+  bounceRate   Float?
+  metadata     Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
