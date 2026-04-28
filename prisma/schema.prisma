@@ -143,7 +143,6 @@ model EntityDecision {
   context    String?  @db.Text
   createdAt  DateTime @default(now())
   entity     Entity   @relation(fields: [entityId], references: [id], onDelete: Cascade)
-  decision   Decision @relation(fields: [decisionId], references: [id], onDelete: Cascade)
 
   @@unique([entityId, decisionId])
   @@index([decisionId])
@@ -190,9 +189,8 @@ model Decision {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  auditLogs       DecisionAuditLog[]
-  signals         ArticleSignals?
-  entityDecisions EntityDecision[]
+  auditLogs DecisionAuditLog[]
+  signals   ArticleSignals?
 
   @@index([trustStatus])
   @@index([impactScore(sort: Desc)])

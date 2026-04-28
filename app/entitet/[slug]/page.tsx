@@ -5,7 +5,7 @@ import { Suspense } from "react";
 import { EntityProfileClient } from "@/components/entities/EntityProfileClient";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
-import { fetchEntityWithGraph, serializeEntity } from "@/lib/entities-public";
+import { fetchEntityWithGraph, serializeEntity, type SerializedEntityPublic } from "@/lib/entities-public";
 import { SITE_URL } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +20,7 @@ function siteHost() {
   }
 }
 
-function jsonLdFor(entity: ReturnType<typeof serializeEntity>, pageUrl: string) {
+function jsonLdFor(entity: SerializedEntityPublic, pageUrl: string) {
   const shared = {
     "@context": "https://schema.org",
     name: entity.nameBs,
@@ -56,7 +56,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     rawMeta && typeof rawMeta === "object" && !Array.isArray(rawMeta) && typeof (rawMeta as { role?: unknown }).role === "string"
       ? (rawMeta as { role: string }).role
       : null;
-  const title = `${row.nameBs} — ${metaRole ?? row.type} | ${host}`;
+  const title = `${row.nameBs} — ${row.role?.trim() || metaRole || row.type} | ${host}`;
   const description = row.shortBio?.trim() || `${row.nameBs} profile: decisions, articles, and relations.`;
   const url = `${SITE_URL}/entitet/${row.slug}/`;
   return {
@@ -89,7 +89,7 @@ function ProfileFallback() {
 export default async function EntityPublicPage({ params }: Props) {
   const row = await fetchEntityWithGraph(params.slug);
   if (!row) notFound();
-  const serialized = serializeEntity(row);
+  const serialized = await serializeEntity(row);
   const pageUrl = `${SITE_URL}/entitet/${serialized.slug}/`;
   const jsonLd = jsonLdFor(serialized, pageUrl);
 

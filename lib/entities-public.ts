@@ -21,11 +21,17 @@ function entityMetadataActiveFrom(meta: Prisma.JsonValue | null | undefined): st
   return typeof r === "string" ? r : null;
 }
 
-export function schemaKindFromEntityType(type: string): "Person" | "Organization" | "Event" | "AdministrativeArea" | "Legislation" {
-  switch (type) {
+export function schemaKindFromEntityType(
+  type: string,
+): "Person" | "Organization" | "Event" | "AdministrativeArea" | "Legislation" {
+  const t = type.toLowerCase();
+  switch (t) {
     case "person":
+    case "player":
       return "Person";
     case "org":
+    case "organization":
+    case "club":
       return "Organization";
     case "event":
       return "Event";
@@ -43,7 +49,7 @@ export async function fetchEntityWithGraph(slug: string) {
     where: { slug },
     include: {
       entityDecisions: { orderBy: { createdAt: "desc" } },
-      entityArticles: { orderBy: { createdAt: "desc" } },
+      entityArticles: { orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }] },
       outgoingRelations: relationSelect,
       incomingRelations: relationSelect,
     },
@@ -52,29 +58,58 @@ export async function fetchEntityWithGraph(slug: string) {
 
 export type EntityWithGraphNonNull = NonNullable<Awaited<ReturnType<typeof fetchEntityWithGraph>>>;
 
-export function serializeEntity(entity: EntityWithGraphNonNull) {
-  const role = entityMetadataRole(entity.metadata);
-  const activeFrom = entityMetadataActiveFrom(entity.metadata);
+function firstLineSummary(context: string | null | undefined, max = 280) {
+  const trimmed = context?.trim();
+  if (!trimmed) return undefined;
+  return trimmed.split(/\n/)[0]?.slice(0, max);
+}
+
+export async function serializeEntity(entity: EntityWithGraphNonNull) {
+  const roleMeta = entityMetadataRole(entity.metadata);
+  const role = entity.role?.trim() || roleMeta;
+  const activeFrom =
+    entity.activeFrom?.toISOString() ?? entityMetadataActiveFrom(entity.metadata);
+  const schemaKind = entity.schemaKind?.trim() || schemaKindFromEntityType(entity.type);
+
+  const decisionIds = Array.from(new Set(entity.entityDecisions.map((d) => d.decisionId)));
+  const decisionRows =
+    decisionIds.length > 0
+      ? await prisma.decision.findMany({
+          where: { id: { in: decisionIds } },
+          select: {
+            id: true,
+            title: true,
+            decisionDate: true,
+            slug: true,
+            createdAt: true,
+          },
+        })
+      : [];
+  const decisionById = new Map(decisionRows.map((d) => [d.id, d]));
+
   const decisions = entity.entityDecisions.map((d) => {
-    const trimmed = d.context?.trim();
-    const firstLine = trimmed ? trimmed.split(/\n/)[0]?.slice(0, 280) : undefined;
-    const title = firstLine ?? d.decisionId;
+    const row = decisionById.get(d.decisionId);
+    const fallbackTitle = firstLineSummary(d.context) ?? d.decisionId;
+    const title = row?.title?.trim() || fallbackTitle;
+    const at = row?.decisionDate ?? row?.createdAt ?? d.createdAt;
     return {
       id: d.id,
       title,
       summary: d.context,
-      decidedAt: d.createdAt.toISOString(),
+      decidedAt: at.toISOString(),
       role: d.role,
-      slug: d.decisionId,
+      slug: row?.slug ?? null,
     };
   });
+
   const articles = entity.entityArticles.map((a) => ({
     id: a.id,
-    title: a.articleId,
-    url: null as string | null,
-    slug: a.articleId,
-    publishedAt: null as string | null,
+    title: a.title?.trim() || a.articleId,
+    url: a.url ?? null,
+    slug: a.slug ?? a.articleId,
+    publishedAt: a.publishedAt ? a.publishedAt.toISOString() : null,
   }));
+
   const outRelations = entity.outgoingRelations.map((r) => ({
     id: r.id,
     relationType: r.type,
@@ -92,6 +127,7 @@ export function serializeEntity(entity: EntityWithGraphNonNull) {
     to: r.toEntity,
   }));
   const relationCount = entity.outgoingRelations.length + entity.incomingRelations.length;
+
   return {
     id: entity.id,
     slug: entity.slug,
@@ -100,11 +136,11 @@ export function serializeEntity(entity: EntityWithGraphNonNull) {
     type: entity.type,
     role,
     shortBio: entity.shortBio,
-    bioRich: null as string | null,
+    bioRich: entity.bioRich,
     imageUrl: entity.imageUrl,
-    avatar: null as string | null,
+    avatar: entity.avatar,
     activeFrom,
-    schemaKind: schemaKindFromEntityType(entity.type),
+    schemaKind,
     counts: {
       decisions: entity.entityDecisions.length,
       articles: entity.entityArticles.length,
@@ -116,4 +152,4 @@ export function serializeEntity(entity: EntityWithGraphNonNull) {
   };
 }
 
-export type SerializedEntityPublic = ReturnType<typeof serializeEntity>;
+export type SerializedEntityPublic = Awaited<ReturnType<typeof serializeEntity>>;

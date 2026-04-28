@@ -10,5 +10,5 @@ export async function GET(_req: NextRequest, ctx: Ctx) {
   const slug = ctx.params.slug;
   const row = await fetchEntityWithGraph(slug);
   if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  return NextResponse.json(serializeEntity(row));
+  return NextResponse.json(await serializeEntity(row));
 }
