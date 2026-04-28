@@ -12,7 +12,7 @@
     "db:push": "prisma db push",
     "vercel-build": "prisma migrate deploy && prisma generate && next build",
     "seed:countries": "ts-node --project tsconfig.seed.json scripts/seed-countries.ts",
-    "seed:entities": "ts-node --project tsconfig.seed.json -r dotenv/config scripts/seed-entities.ts",
+    "seed:entities": "ts-node --project tsconfig.seed.json -r dotenv/config scripts/seed-entities-v0.ts",
     "fix:country-names": "ts-node --transpile-only --project tsconfig.seed.json scripts/fix-country-names.ts",
     "generate:ai-summaries": "ts-node --project tsconfig.seed.json scripts/generate-ai-summaries.ts",
     "fix:proxy-urls": "ts-node --skip-project --transpile-only --compiler-options '{\"module\":\"CommonJS\",\"moduleResolution\":\"node\"}' -r dotenv/config -r tsconfig-paths/register scripts/fix-proxy-urls.ts",

@@ -95,26 +95,26 @@ model ArticlePerformance {
 }
 
 model Entity {
-  id                String             @id @default(cuid())
+  id                String           @id @default(cuid())
   type              String
-  slug              String             @unique
+  slug              String           @unique
   nameBs            String
   nameEn            String?
   role              String?
-  shortBio          String?            @db.Text
-  bioRich           String?            @db.Text
+  shortBio          String?          @db.Text
+  bioRich           String?          @db.Text
   imageUrl          String?
   avatar            String?
   activeFrom        DateTime?
-  schemaKind        String             @default("Person")
+  schemaKind        String           @default("Person")
   metadata          Json?
-  isVerified        Boolean            @default(false)
-  outgoingRelations Relation[]         @relation("FromEntity")
-  incomingRelations Relation[]         @relation("ToEntity")
+  isVerified        Boolean          @default(false)
+  outgoingRelations Relation[]       @relation("FromEntity")
+  incomingRelations Relation[]       @relation("ToEntity")
   entityDecisions   EntityDecision[]
   entityArticles    EntityArticle[]
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
 
   @@index([type, isVerified])
   @@index([slug])
@@ -166,11 +166,11 @@ model EntityArticle {
 }
 
 model Decision {
-  id              String   @id @default(cuid())
+  id              String    @id @default(cuid())
   articleId       String?
   slug            String?
   title           String?
-  source          String   @default("OHR")
+  source          String    @default("OHR")
   sourceCaseId    String?
   defendant       String?
   decisionDate    DateTime?
@@ -179,15 +179,15 @@ model Decision {
   pdfHash         String?
   pdfBlobUrl      String?
   pageCount       Int?
-  extractDeferred Boolean  @default(false)
-  trustStatus     String   @default("ai_generated")
-  impactScore     Float    @default(0)
+  extractDeferred Boolean   @default(false)
+  trustStatus     String    @default("ai_generated")
+  impactScore     Float     @default(0)
   aiConfidence    Float?
-  editorValidated Boolean  @default(false)
-  version         Int      @default(1)
-  needsDiffReview Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  editorValidated Boolean   @default(false)
+  version         Int       @default(1)
+  needsDiffReview Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   auditLogs DecisionAuditLog[]
   signals   ArticleSignals?
