@@ -1,0 +1,29 @@
+ALTER TABLE "Entity" ADD COLUMN IF NOT EXISTS "role" TEXT;
+
+ALTER TABLE "Entity" ADD COLUMN IF NOT EXISTS "bioRich" TEXT;
+
+ALTER TABLE "Entity" ADD COLUMN IF NOT EXISTS "avatar" TEXT;
+
+ALTER TABLE "Entity" ADD COLUMN IF NOT EXISTS "activeFrom" TIMESTAMP(3);
+
+ALTER TABLE "Entity" ADD COLUMN IF NOT EXISTS "schemaKind" TEXT NOT NULL DEFAULT 'Person';
+
+ALTER TABLE "EntityArticle" ADD COLUMN IF NOT EXISTS "title" TEXT;
+
+ALTER TABLE "EntityArticle" ADD COLUMN IF NOT EXISTS "url" TEXT;
+
+ALTER TABLE "EntityArticle" ADD COLUMN IF NOT EXISTS "slug" TEXT;
+
+ALTER TABLE "EntityArticle" ADD COLUMN IF NOT EXISTS "publishedAt" TIMESTAMP(3);
+
+ALTER TABLE "EntityDecision" DROP CONSTRAINT IF EXISTS "EntityDecision_entityId_fkey";
+
+ALTER TABLE "EntityDecision" ADD CONSTRAINT "EntityDecision_entityId_fkey" FOREIGN KEY ("entityId") REFERENCES "Entity"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "EntityDecision" DROP CONSTRAINT IF EXISTS "EntityDecision_decisionId_fkey";
+
+ALTER TABLE "EntityDecision" ADD CONSTRAINT "EntityDecision_decisionId_fkey" FOREIGN KEY ("decisionId") REFERENCES "Decision"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "EntityArticle" DROP CONSTRAINT IF EXISTS "EntityArticle_entityId_fkey";
+
+ALTER TABLE "EntityArticle" ADD CONSTRAINT "EntityArticle_entityId_fkey" FOREIGN KEY ("entityId") REFERENCES "Entity"("id") ON DELETE CASCADE ON UPDATE CASCADE;

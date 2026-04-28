@@ -18,6 +18,7 @@ const config: Config = {
         gold: "var(--gold)",
         gold2: "var(--gold2)",
         live: "var(--live)",
+        line: "var(--line)",
       },
       fontFamily: {
         display: ["var(--font-playfair)", "serif"],

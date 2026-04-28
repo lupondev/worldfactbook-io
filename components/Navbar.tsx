@@ -17,6 +17,9 @@ export function Navbar() {
           <Link className="hover:text-gold transition-colors" href="/countries/">
             Countries
           </Link>
+          <Link className="hover:text-gold transition-colors" href="/entitet/">
+            Entities
+          </Link>
           <Link className="hover:text-gold transition-colors" href="/rankings/">
             Rankings
           </Link>

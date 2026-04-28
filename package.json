@@ -12,18 +12,22 @@
     "db:push": "prisma db push",
     "vercel-build": "prisma migrate deploy && prisma generate && next build",
     "seed:countries": "ts-node --project tsconfig.seed.json scripts/seed-countries.ts",
+    "seed:entities": "ts-node --project tsconfig.seed.json -r dotenv/config scripts/seed-entities.ts",
     "fix:country-names": "ts-node --transpile-only --project tsconfig.seed.json scripts/fix-country-names.ts",
     "generate:ai-summaries": "ts-node --project tsconfig.seed.json scripts/generate-ai-summaries.ts",
-    "fix:proxy-urls": "ts-node --skip-project --transpile-only --compiler-options '{\"module\":\"CommonJS\",\"moduleResolution\":\"node\"}' -r dotenv/config -r tsconfig-paths/register scripts/fix-proxy-urls.ts"
+    "fix:proxy-urls": "ts-node --skip-project --transpile-only --compiler-options '{\"module\":\"CommonJS\",\"moduleResolution\":\"node\"}' -r dotenv/config -r tsconfig-paths/register scripts/fix-proxy-urls.ts",
+    "backfill:icty-bih": "ts-node --project tsconfig.seed.json -r dotenv/config -r tsconfig-paths/register scripts/backfill-icty-bih.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",
     "@prisma/client": "5.22.0",
+    "@vercel/blob": "^2.0.0",
     "gray-matter": "^4.0.3",
     "next": "14.2.35",
     "react": "^18",
     "react-dom": "^18",
     "react-markdown": "^10.1.0",
+    "recharts": "^3.8.1",
     "remark-gfm": "^4.0.1"
   },
   "ts-node": {
