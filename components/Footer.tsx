@@ -26,6 +26,16 @@ export function Footer() {
             <li>UNDP HDI</li>
           </ul>
         </div>
+        <div className="text-sm text-muted">
+          <p className="font-mono text-xs uppercase tracking-wider text-cream/70">Pravo & edukacija</p>
+          <ul className="mt-2 grid gap-1">
+            <li>
+              <Link className="text-gold hover:underline" href="/odluke/">
+                OHR Odluke
+              </Link>
+            </li>
+          </ul>
+        </div>
       </div>
       <p className="mx-auto mt-10 max-w-6xl text-center font-mono text-xs text-muted">
         FREE FOREVER · © 2026 ·{" "}
