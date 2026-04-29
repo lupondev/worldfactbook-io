@@ -13,7 +13,9 @@ type QuizItem = {
   summary?: string;
   summaryBs?: string;
   category?: string;
-  questionsCount?: number;
+  questionCount?: number;
+  playCount?: number;
+  avgScore?: number;
   publishedAt?: string;
 };
 
@@ -41,6 +43,8 @@ export default async function KvizoviPage() {
   } catch {}
 
   const chips = ["Sve", "Politika", "Historija", "Pravo", "Društvo"] as const;
+  const hero = items[0];
+  const rest = items.slice(1);
 
   return (
     <>
@@ -58,14 +62,31 @@ export default async function KvizoviPage() {
           </div>
         </header>
 
+        {hero ? (
+          <article className="mt-6 rounded-xl border border-bg4 bg-bg2/70 p-6">
+            <p className="font-mono text-xs uppercase tracking-wide text-gold">{hero.category || "Kviz"}</p>
+            <h2 className="mt-2 font-display text-3xl text-cream">{hero.titleBs || hero.title || "Kviz"}</h2>
+            <p className="mt-2 text-sm text-muted">{hero.summaryBs || hero.summary || "Provjeri koliko dobro poznaješ temu."}</p>
+            <p className="mt-3 font-mono text-xs text-muted">
+              {hero.questionCount ?? "?"} pitanja · {hero.playCount ?? 0} igranja · prosjek {hero.avgScore ?? 0}
+            </p>
+            <Link
+              href={`/kviz/${hero.slug || hero.id || ""}`}
+              className="mt-4 inline-block font-mono text-xs font-bold uppercase tracking-wide text-gold hover:underline"
+            >
+              Pokreni kviz →
+            </Link>
+          </article>
+        ) : null}
+
         <div className="mt-6 grid gap-4 md:grid-cols-2">
-          {items.map((q) => (
+          {rest.map((q) => (
             <article key={q.slug || q.id} className="rounded-lg border border-bg4 bg-bg2/70 p-5">
               <p className="font-mono text-xs uppercase tracking-wide text-gold">{q.category || "Kviz"}</p>
               <h2 className="mt-2 font-display text-2xl text-cream">{q.titleBs || q.title || "Kviz"}</h2>
               <p className="mt-2 text-sm text-muted">{q.summaryBs || q.summary || "Provjeri koliko dobro poznaješ temu."}</p>
               <p className="mt-3 font-mono text-xs text-muted">
-                {q.questionsCount ?? "?"} pitanja · {toDateLabel(q.publishedAt)}
+                {q.questionCount ?? "?"} pitanja · {q.playCount ?? 0} igranja · prosjek {q.avgScore ?? 0} · {toDateLabel(q.publishedAt)}
               </p>
               <Link
                 href={`/kviz/${q.slug || q.id || ""}`}

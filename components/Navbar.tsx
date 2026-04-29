@@ -1,6 +1,11 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export function Navbar() {
+  const pathname = usePathname();
+  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
   return (
     <header className="border-b border-bg4/80 bg-bg2/90 backdrop-blur-md sticky top-0 z-40">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-4 md:px-6">
@@ -14,28 +19,28 @@ export function Navbar() {
           </span>
         </Link>
         <nav className="hidden items-center gap-6 text-sm text-cream/90 md:flex">
-          <Link className="hover:text-gold transition-colors" href="/countries/">
+          <Link className={`transition-colors ${isActive("/countries") ? "text-gold" : "hover:text-gold"}`} href="/countries/">
             Countries
           </Link>
-          <Link className="hover:text-gold transition-colors" href="/odluke/">
+          <Link className={`transition-colors ${isActive("/odluke") ? "text-gold" : "hover:text-gold"}`} href="/odluke/">
             Odluke
           </Link>
-          <Link className="hover:text-gold transition-colors" href="/entitet/">
+          <Link className={`transition-colors ${isActive("/entitet") ? "text-gold" : "hover:text-gold"}`} href="/entitet/">
             Entities
           </Link>
-          <Link className="hover:text-gold transition-colors" href="/rankings/">
+          <Link className={`transition-colors ${isActive("/rankings") ? "text-gold" : "hover:text-gold"}`} href="/rankings/">
             Rankings
           </Link>
-          <Link className="hover:text-gold transition-colors" href="/compare/">
+          <Link className={`transition-colors ${isActive("/compare") ? "text-gold" : "hover:text-gold"}`} href="/compare/">
             Compare
           </Link>
-          <Link className="hover:text-gold transition-colors" href="/countries/?ai=1">
+          <Link className={`transition-colors ${isActive("/countries") ? "text-gold" : "hover:text-gold"}`} href="/countries/?ai=1">
             AI Intel
           </Link>
-          <Link className="hover:text-gold transition-colors" href="/api-docs/">
+          <Link className={`transition-colors ${isActive("/api-docs") ? "text-gold" : "hover:text-gold"}`} href="/api-docs/">
             API
           </Link>
-          <Link className="hover:text-gold transition-colors" href="/blog/">
+          <Link className={`transition-colors ${isActive("/blog") ? "text-gold" : "hover:text-gold"}`} href="/blog/">
             Blog
           </Link>
         </nav>

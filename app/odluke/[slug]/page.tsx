@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { DecisionTabs } from "@/app/odluke/[slug]/DecisionTabs";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 
@@ -35,6 +36,25 @@ function dateBs(value?: string) {
   return `${d.toLocaleDateString("bs-BA", { day: "numeric", month: "long", year: "numeric" })}.`;
 }
 
+export async function generateMetadata({ params }: { params: { slug: string } }) {
+  let decision: DecisionDetail | null = null;
+  try {
+    const res = await fetch(`${getDiurnaBase()}/api/public/decisions/${params.slug}`, {
+      next: { revalidate: 300 },
+    });
+    if (res.ok) decision = (await res.json()) as DecisionDetail;
+  } catch {}
+  return {
+    title: `${decision?.titleBs || "Odluka"} | novi.ba`,
+    description: decision?.summaryBs?.[0] || "OHR odluka",
+    openGraph: {
+      title: `${decision?.titleBs || "Odluka"} | novi.ba`,
+      description: decision?.summaryBs?.[0] || "OHR odluka",
+      images: [{ url: "https://noviba-v0-design.vercel.app/og-default.jpg" }],
+    },
+  };
+}
+
 export default async function OdlukaDetailPage({ params }: { params: { slug: string } }) {
   let decision: DecisionDetail | null = null;
   try {
@@ -49,9 +69,14 @@ export default async function OdlukaDetailPage({ params }: { params: { slug: str
     "@context": "https://schema.org",
     "@type": "LegalCase",
     name: decision.titleBs || "OHR odluka",
-    datePublished: decision.publishedAt || undefined,
+    dateCreated: decision.publishedAt || undefined,
     description: decision.summaryBs?.[0] || "",
-    url: `https://worldfactbook.io/odluke/${decision.slug || params.slug}/`,
+    publisher: {
+      "@type": "Organization",
+      name: "Office of the High Representative",
+      url: "https://www.ohr.int",
+    },
+    url: `https://noviba-v0-design.vercel.app/odluke/${decision.slug || params.slug}/`,
   };
 
   return (
@@ -74,7 +99,7 @@ export default async function OdlukaDetailPage({ params }: { params: { slug: str
           <span className="font-mono text-xs text-muted">{dateBs(decision.publishedAt)}</span>
         </div>
 
-        <h1 className="mt-4 font-display text-4xl text-cream">{decision.titleBs || "OHR odluka"}</h1>
+        <h1 className="mt-4 font-display text-[clamp(2.25rem,4vw,3rem)] text-cream">{decision.titleBs || "OHR odluka"}</h1>
 
         <section className="mt-8 rounded-lg border border-bg4 bg-bg2/70 p-5">
           <h2 className="font-display text-2xl text-cream">Sažetak za 30 sekundi</h2>
@@ -85,23 +110,11 @@ export default async function OdlukaDetailPage({ params }: { params: { slug: str
           </ul>
         </section>
 
-        <section className="mt-6 rounded-lg border border-bg4 bg-bg2/70 p-5">
-          <h2 className="font-display text-2xl text-cream">Šta to znači za</h2>
-          <div className="mt-3 grid gap-3 md:grid-cols-3">
-            <div className="rounded border border-bg4 bg-bg3/60 p-3">
-              <p className="font-mono text-xs uppercase tracking-wide text-gold">Građanina</p>
-              <p className="mt-2 text-sm text-cream/90">{decision.whyShouldICare?.gradjanin || "N/A"}</p>
-            </div>
-            <div className="rounded border border-bg4 bg-bg3/60 p-3">
-              <p className="font-mono text-xs uppercase tracking-wide text-gold">Političara</p>
-              <p className="mt-2 text-sm text-cream/90">{decision.whyShouldICare?.politicar || "N/A"}</p>
-            </div>
-            <div className="rounded border border-bg4 bg-bg3/60 p-3">
-              <p className="font-mono text-xs uppercase tracking-wide text-gold">Advokata</p>
-              <p className="mt-2 text-sm text-cream/90">{decision.whyShouldICare?.advokat || "N/A"}</p>
-            </div>
-          </div>
-        </section>
+        <DecisionTabs
+          gradjanin={decision.whyShouldICare?.gradjanin}
+          politicar={decision.whyShouldICare?.politicar}
+          advokat={decision.whyShouldICare?.advokat}
+        />
 
         <section className="mt-6 rounded-lg border border-bg4 bg-bg2/70 p-5">
           <h2 className="font-display text-2xl text-cream">Pogođeni entiteti</h2>
@@ -123,6 +136,7 @@ export default async function OdlukaDetailPage({ params }: { params: { slug: str
         <p className="mt-6 font-mono text-xs text-muted">
           Generirano AI-jem · Confidence {Math.round((decision.aiConfidence || 0) * 100)}%
         </p>
+        <p className="mt-2 font-mono text-xs text-muted">Tekst generisan AI-jem na osnovu OHR dokumenta.</p>
       </main>
       <Footer />
     </>

@@ -26,8 +26,8 @@ function getDiurnaBase() {
 
 function impactLabel(score: number) {
   if (score >= 9) return { text: `${score}/10 KRITIČNO`, cls: "bg-red-700/90 text-red-100" };
-  if (score >= 8) return { text: `${score}/10 VISOKO`, cls: "bg-orange-700/90 text-orange-100" };
-  return { text: `${score}/10 ZNAČAJNO`, cls: "bg-yellow-700/90 text-yellow-100" };
+  if (score >= 8) return { text: `${score}/10 VAŽNO`, cls: "bg-orange-700/90 text-orange-100" };
+  return { text: `${score}/10 BITNO`, cls: "bg-yellow-700/90 text-yellow-100" };
 }
 
 function dateBs(value?: string) {
@@ -62,15 +62,17 @@ export default async function OdlukePage({ searchParams }: { searchParams?: Sear
         <p className="mt-2 text-sm text-muted">AI analizira, građanin razumije. OHR odluke s impact scoreom.</p>
         <div className="mt-6 flex flex-wrap gap-2">
           {[
-            { id: "7", label: "Sve" },
+            { id: "all", label: "Sve" },
             { id: "9", label: "Impact 9 (kritično)" },
             { id: "8", label: "Impact 8 (narandžasto)" },
             { id: "7", label: "Impact 7 (žuto)" },
-          ].map((f, i) => (
+          ].map((f) => (
             <Link
-              key={`${f.label}-${i}`}
-              href={i === 0 ? "/odluke/" : `/odluke/?impact=${f.id}`}
-              className={`rounded border px-3 py-1.5 font-mono text-xs ${minImpact === Number(f.id) || (i === 0 && minImpact === 7) ? "border-gold text-gold" : "border-bg4 text-muted"}`}
+              key={f.id}
+              href={f.id === "all" ? "/odluke/" : `/odluke/?impact=${f.id}`}
+              className={`rounded border px-3 py-1.5 font-mono text-xs ${
+                (f.id === "all" && !searchParams?.impact) || minImpact === Number(f.id) ? "border-gold text-gold" : "border-bg4 text-muted"
+              }`}
             >
               {f.label}
             </Link>
