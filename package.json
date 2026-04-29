@@ -16,7 +16,8 @@
     "fix:country-names": "ts-node --transpile-only --project tsconfig.seed.json scripts/fix-country-names.ts",
     "generate:ai-summaries": "ts-node --project tsconfig.seed.json scripts/generate-ai-summaries.ts",
     "fix:proxy-urls": "ts-node --skip-project --transpile-only --compiler-options '{\"module\":\"CommonJS\",\"moduleResolution\":\"node\"}' -r dotenv/config -r tsconfig-paths/register scripts/fix-proxy-urls.ts",
-    "backfill:icty-bih": "ts-node --project tsconfig.seed.json -r dotenv/config -r tsconfig-paths/register scripts/backfill-icty-bih.ts"
+    "backfill:icty-bih": "ts-node --project tsconfig.seed.json -r dotenv/config -r tsconfig-paths/register scripts/backfill-icty-bih.ts",
+    "seed:iran-us-live": "ts-node --project tsconfig.seed.json -r dotenv/config -r tsconfig-paths/register scripts/seed-iran-us-live.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",

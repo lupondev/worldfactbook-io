@@ -238,3 +238,80 @@ model IngestLog {
   @@index([sourceDomain, action, createdAt])
   @@map("ingest_logs")
 }
+
+model LiveBlog {
+  id              String   @id @default(cuid())
+  siteId          String
+  slug            String   @unique
+  title           String
+  subtitle        String?
+  description     String   @db.Text
+  templateType    String   @default("generic")
+  status          String   @default("draft")
+  startedAt       DateTime?
+  endedAt         DateTime?
+  heroImage       String?
+  aiEditorEnabled Boolean  @default(true)
+  aiTopics        String[] @default([])
+  viewerCount     Int      @default(0)
+  updateCount     Int      @default(0)
+  metadata        Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  deletedAt       DateTime?
+
+  updates   LiveBlogUpdate[]
+  reactions LiveBlogReaction[]
+
+  @@index([siteId, status, startedAt(sort: Desc)])
+  @@index([slug])
+  @@map("live_blogs")
+}
+
+model LiveBlogUpdate {
+  id                 String    @id @default(cuid())
+  liveBlogId         String
+  liveBlog           LiveBlog  @relation(fields: [liveBlogId], references: [id], onDelete: Cascade)
+  updateType         String
+  headline           String?
+  body               String    @db.Text
+  pinned             Boolean   @default(false)
+  importance         Int       @default(5)
+  authorType         String    @default("ai")
+  authorName         String?
+  imageUrl           String?
+  imageCaption       String?
+  embedHtml          String?   @db.Text
+  embedType          String?
+  sourceUrl          String?
+  sourceName         String?
+  relatedArticleId   String?
+  relatedArticleSlug String?
+  status             String    @default("published")
+  publishedAt        DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  deletedAt          DateTime?
+
+  reactions LiveBlogReaction[]
+
+  @@index([liveBlogId, publishedAt(sort: Desc)])
+  @@index([liveBlogId, pinned, publishedAt(sort: Desc)])
+  @@index([relatedArticleId])
+  @@map("live_blog_updates")
+}
+
+model LiveBlogReaction {
+  id        String          @id @default(cuid())
+  liveBlogId String
+  liveBlog  LiveBlog        @relation(fields: [liveBlogId], references: [id], onDelete: Cascade)
+  updateId  String?
+  update    LiveBlogUpdate? @relation(fields: [updateId], references: [id], onDelete: SetNull)
+  emoji     String
+  ipHash    String?
+  sessionId String?
+  createdAt DateTime        @default(now())
+
+  @@unique([updateId, emoji, ipHash])
+  @@index([liveBlogId, emoji])
+  @@map("live_blog_reactions")
+}
