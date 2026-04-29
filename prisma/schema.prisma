@@ -226,3 +226,15 @@ model DecisionAuditLog {
   @@index([actor])
   @@index([createdAt(sort: Desc)])
 }
+
+model IngestLog {
+  id           String   @id @default(cuid())
+  sourceUrl    String
+  sourceDomain String
+  action       String
+  reason       String?
+  createdAt    DateTime @default(now())
+
+  @@index([sourceDomain, action, createdAt])
+  @@map("ingest_logs")
+}
