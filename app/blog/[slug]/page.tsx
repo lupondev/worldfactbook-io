@@ -9,6 +9,10 @@ import { getAllPosts, getPostBySlug, getRelatedPosts } from "@/lib/blog";
 import { resolveFeaturedImage } from "@/lib/featured-image";
 import { SITE_URL } from "@/lib/site";
 
+export const dynamic = "force-static";
+export const revalidate = false;
+export const dynamicParams = false;
+
 type Props = { params: { slug: string } };
 
 export async function generateStaticParams() {

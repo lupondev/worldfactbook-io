@@ -6,6 +6,9 @@ import { Navbar } from "@/components/Navbar";
 import { getAllPosts } from "@/lib/blog";
 import { SITE_URL } from "@/lib/site";
 
+export const dynamic = "force-static";
+export const revalidate = false;
+
 const DESC = "Updates on WorldFactbook.io data pipelines, methodology, and the free country intelligence API.";
 
 export const metadata: Metadata = {

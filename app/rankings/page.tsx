@@ -6,7 +6,8 @@ import { RankingsTable } from "@/components/RankingsTable";
 import { prisma } from "@/lib/prisma";
 import { SITE_URL } from "@/lib/site";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
+export const revalidate = false;
 
 const RANKINGS_DESCRIPTION =
   "Sort 260+ countries by GDP, GDP per capita, population, HDI, democracy score, and corruption — WorldFactbook.io.";

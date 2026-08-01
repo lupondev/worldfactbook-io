@@ -5,8 +5,15 @@ import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { prisma } from "@/lib/prisma";
+import { liveBlogStaticParams } from "@/lib/static-build";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
+export const revalidate = false;
+export const dynamicParams = false;
+
+export async function generateStaticParams() {
+  return liveBlogStaticParams();
+}
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const blog = await prisma.liveBlog.findUnique({ where: { slug: params.slug } });

@@ -5,6 +5,9 @@ import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { SITE_URL } from "@/lib/site";
 
+export const dynamic = "force-static";
+export const revalidate = false;
+
 const META_DESC =
   "AI-powered country briefs for 261 countries. Ask any question about any country and get answers grounded in World Bank, IMF and UN data. Free, no signup required.";
 

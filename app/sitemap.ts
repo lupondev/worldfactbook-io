@@ -3,7 +3,8 @@ import type { MetadataRoute } from "next";
 import { getAllPosts } from "@/lib/blog";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
+export const revalidate = false;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const diurnaBase = process.env.NEXT_PUBLIC_DIURNA_URL || "https://diurna.vercel.app";
@@ -34,9 +35,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   let odlukeSlugs: string[] = [];
   try {
-    const res = await fetch(`${diurnaBase}/api/public/decisions?site=novi.ba&minImpact=7&pageSize=100`, {
-      next: { revalidate: 300 },
-    });
+    const res = await fetch(`${diurnaBase}/api/public/decisions?site=novi.ba&minImpact=7&pageSize=100`);
     if (res.ok) {
       const payload = (await res.json()) as { items?: Array<{ slug?: string; id?: string }> };
       odlukeSlugs = (payload.items || [])

@@ -7,10 +7,17 @@ import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { fetchEntityWithGraph, serializeEntity, type SerializedEntityPublic } from "@/lib/entities-public";
 import { SITE_URL } from "@/lib/site";
+import { entityStaticParams } from "@/lib/static-build";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
+export const revalidate = false;
+export const dynamicParams = false;
 
 type Props = { params: { slug: string } };
+
+export async function generateStaticParams() {
+  return entityStaticParams();
+}
 
 function siteHost() {
   try {

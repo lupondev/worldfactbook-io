@@ -5,6 +5,9 @@ import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { SITE_URL } from "@/lib/site";
 
+export const dynamic = "force-static";
+export const revalidate = false;
+
 export const metadata: Metadata = {
   title: "Free REST API - World Factbook",
   description: "JSON API for all countries — no API key required. Open CORS, weekly refresh.",

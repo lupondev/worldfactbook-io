@@ -4,8 +4,11 @@ import { notFound } from "next/navigation";
 import { DecisionTabs } from "@/app/odluke/[slug]/DecisionTabs";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
+import { decisionStaticParams } from "@/lib/static-build";
 
-export const revalidate = 300;
+export const dynamic = "force-static";
+export const revalidate = false;
+export const dynamicParams = false;
 
 type DecisionDetail = {
   id?: string;
@@ -36,12 +39,14 @@ function dateBs(value?: string) {
   return `${d.toLocaleDateString("bs-BA", { day: "numeric", month: "long", year: "numeric" })}.`;
 }
 
+export async function generateStaticParams() {
+  return decisionStaticParams();
+}
+
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   let decision: DecisionDetail | null = null;
   try {
-    const res = await fetch(`${getDiurnaBase()}/api/public/decisions/${params.slug}`, {
-      next: { revalidate: 300 },
-    });
+    const res = await fetch(`${getDiurnaBase()}/api/public/decisions/${params.slug}`);
     if (res.ok) decision = (await res.json()) as DecisionDetail;
   } catch {}
   return {
@@ -58,9 +63,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 export default async function OdlukaDetailPage({ params }: { params: { slug: string } }) {
   let decision: DecisionDetail | null = null;
   try {
-    const res = await fetch(`${getDiurnaBase()}/api/public/decisions/${params.slug}`, {
-      next: { revalidate: 300 },
-    });
+    const res = await fetch(`${getDiurnaBase()}/api/public/decisions/${params.slug}`);
     if (res.ok) decision = (await res.json()) as DecisionDetail;
   } catch {}
   if (!decision) notFound();

@@ -3,8 +3,11 @@ import { notFound } from "next/navigation";
 
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
+import { quizStaticParams } from "@/lib/static-build";
 
-export const revalidate = 300;
+export const dynamic = "force-static";
+export const revalidate = false;
+export const dynamicParams = false;
 
 type QuizDetail = {
   slug?: string;
@@ -21,12 +24,14 @@ function getDiurnaBase() {
   return process.env.NEXT_PUBLIC_DIURNA_URL || "https://diurna.vercel.app";
 }
 
+export async function generateStaticParams() {
+  return quizStaticParams();
+}
+
 export default async function QuizDetailPage({ params }: { params: { slug: string } }) {
   let quiz: QuizDetail | null = null;
   try {
-    const res = await fetch(`${getDiurnaBase()}/api/public/quizzes/${params.slug}`, {
-      next: { revalidate: 300 },
-    });
+    const res = await fetch(`${getDiurnaBase()}/api/public/quizzes/${params.slug}`);
     if (res.ok) quiz = (await res.json()) as QuizDetail;
   } catch {}
   if (!quiz) notFound();

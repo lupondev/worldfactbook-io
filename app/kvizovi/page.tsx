@@ -3,7 +3,8 @@ import Link from "next/link";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 
-export const revalidate = 300;
+export const dynamic = "force-static";
+export const revalidate = false;
 
 type QuizItem = {
   slug?: string;
@@ -33,9 +34,7 @@ function toDateLabel(value?: string) {
 export default async function KvizoviPage() {
   let items: QuizItem[] = [];
   try {
-    const res = await fetch(`${getDiurnaBase()}/api/public/quizzes?site=novi.ba&pageSize=50`, {
-      next: { revalidate: 300 },
-    });
+    const res = await fetch(`${getDiurnaBase()}/api/public/quizzes?site=novi.ba&pageSize=50`);
     if (res.ok) {
       const payload = (await res.json()) as { items?: QuizItem[] };
       if (Array.isArray(payload.items)) items = payload.items;

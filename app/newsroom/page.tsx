@@ -1,7 +1,8 @@
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
+export const revalidate = false;
 
 export default function NewsroomPage() {
   const todayCount = 0;

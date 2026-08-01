@@ -6,7 +6,8 @@ import { Navbar } from "@/components/Navbar";
 import { prisma } from "@/lib/prisma";
 import { SITE_URL } from "@/lib/site";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
+export const revalidate = false;
 
 const COMPARE_DESC =
   "Compare two to four countries: GDP, population, HDI rank, democracy, life expectancy, inflation, debt, and literacy.";
