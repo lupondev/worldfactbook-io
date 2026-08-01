@@ -10,7 +10,7 @@
     "postinstall": "prisma generate",
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",
-    "vercel-build": "prisma migrate deploy && prisma generate && next build",
+    "vercel-build": "prisma generate && next build",
     "seed:countries": "ts-node --project tsconfig.seed.json scripts/seed-countries.ts",
     "seed:entities": "ts-node --project tsconfig.seed.json -r dotenv/config scripts/seed-entities-v0.ts",
     "fix:country-names": "ts-node --transpile-only --project tsconfig.seed.json scripts/fix-country-names.ts",
